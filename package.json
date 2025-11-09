@@ -1,0 +1,26 @@
+{
+  "name": "dwolla-billing",
+  "version": "1.0.0",
+  "private": true,
+  "description": "",
+  "main": "src/server.js",
+  "type": "commonjs",
+  "scripts": {
+    "dev": "nodemon src/server.js",
+    "migrate": "node -e \"require('dotenv').config(); require('child_process').execSync('psql \\\"' + process.env.DATABASE_URL + '\\\" -f sql/001_schema.sql', {stdio: 'inherit'})\"",
+    "bill:week": "curl -s -X POST -H \"Authorization: Bearer admin\" http://localhost:3000/bill/week"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "body-parser": "^2.2.0",
+    "express": "^5.1.0",
+    "luxon": "^3.7.2",
+    "pg": "^8.16.3"
+  },
+  "devDependencies": {
+    "dotenv": "^16.4.5",
+    "nodemon": "^3.1.10"
+  }
+}
