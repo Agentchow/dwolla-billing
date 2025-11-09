@@ -1,19 +1,23 @@
 #!/usr/bin/env node
 /**
  * Verify micro-deposits for a funding source
- * Usage: node verify-micro-deposits.js <funding-source-id> <amount1> <amount2>
+ * Usage: node verify-micro-deposits.js
  */
 
 require('dotenv').config({ override: true });
+const readline = require('readline');
 
 const { DWOLLA_BASE, DWOLLA_KEY, DWOLLA_SECRET } = process.env;
 
-const [,, fundingSourceId, amount1, amount2] = process.argv;
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
 
-if (!fundingSourceId || !amount1 || !amount2) {
-  console.error('❌ Usage: node verify-micro-deposits.js <funding-source-id> <amount1> <amount2>');
-  console.error('   Example: node verify-micro-deposits.js abc-123 0.03 0.07');
-  process.exit(1);
+function question(prompt) {
+  return new Promise((resolve) => {
+    rl.question(prompt, resolve);
+  });
 }
 
 async function getToken() {
@@ -38,7 +42,27 @@ async function getToken() {
 
 async function verifyMicroDeposits() {
   try {
-    console.log('🔐 Getting Dwolla token...');
+    console.log('💰 Verify Micro-Deposits\n');
+    
+    const fundingSourceId = await question('Funding Source ID: ');
+    if (!fundingSourceId) {
+      console.error('❌ Funding Source ID is required');
+      process.exit(1);
+    }
+
+    const amount1 = await question('Amount 1 (e.g., 0.03): ');
+    if (!amount1) {
+      console.error('❌ Amount 1 is required');
+      process.exit(1);
+    }
+
+    const amount2 = await question('Amount 2 (e.g., 0.07): ');
+    if (!amount2) {
+      console.error('❌ Amount 2 is required');
+      process.exit(1);
+    }
+
+    console.log('\n🔐 Getting Dwolla token...');
     const token = await getToken();
     console.log('✅ Token obtained\n');
 
@@ -77,8 +101,9 @@ async function verifyMicroDeposits() {
     console.error('❌ Error:', error.message);
     if (error.stack) console.error(error.stack);
     process.exit(1);
+  } finally {
+    rl.close();
   }
 }
 
 verifyMicroDeposits();
-

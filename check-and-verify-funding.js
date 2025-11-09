@@ -1,13 +1,26 @@
 #!/usr/bin/env node
 /**
- * Check and verify ZACH1's funding source via micro-deposits
+ * Check and verify a customer's funding source via micro-deposits
+ * Usage: node check-and-verify-funding.js
  */
 
 require('dotenv').config({ override: true });
 const { Pool } = require('pg');
+const readline = require('readline');
 
 const db = new Pool({ connectionString: process.env.DATABASE_URL });
 const { DWOLLA_BASE, DWOLLA_KEY, DWOLLA_SECRET } = process.env;
+
+const rl = readline.createInterface({
+  input: process.stdin,
+  output: process.stdout
+});
+
+function question(prompt) {
+  return new Promise((resolve) => {
+    rl.question(prompt, resolve);
+  });
+}
 
 async function getToken() {
   const creds = Buffer.from(`${DWOLLA_KEY.trim()}:${DWOLLA_SECRET.trim()}`).toString('base64');
@@ -67,28 +80,35 @@ async function dwollaPost(token, url, body) {
   return { status: res.status, body: text };
 }
 
-async function verifyZachFundingSource() {
+async function verifyFundingSource() {
   try {
-    // Get ZACH1's funding source from database
+    console.log('🔧 Check and Verify Funding Source\n');
+    
+    const crmContactId = await question('CRM Contact ID: ');
+    if (!crmContactId) {
+      console.error('❌ CRM Contact ID is required');
+      process.exit(1);
+    }
+
     const result = await db.query(
       'SELECT crm_contact_id, name, dwolla_funding_href FROM customers WHERE crm_contact_id = $1',
-      ['ZACH1']
+      [crmContactId]
     );
 
     if (result.rows.length === 0) {
-      console.error('❌ ZACH1 not found in database');
+      console.error(`❌ Customer "${crmContactId}" not found in database`);
       process.exit(1);
     }
 
-    const zach = result.rows[0];
-    const fundingSourceHref = zach.dwolla_funding_href;
+    const customer = result.rows[0];
+    const fundingSourceHref = customer.dwolla_funding_href;
     
     if (!fundingSourceHref) {
-      console.error('❌ ZACH1 has no funding source set');
+      console.error(`❌ Customer "${crmContactId}" has no funding source set`);
       process.exit(1);
     }
 
-    console.log('🔍 Checking ZACH1\'s Funding Source...\n');
+    console.log(`\n🔍 Checking ${customer.name}'s Funding Source...\n`);
     console.log('Funding Source HREF:', fundingSourceHref);
 
     const fundingSourceId = fundingSourceHref.split('/funding-sources/')[1];
@@ -108,12 +128,18 @@ async function verifyZachFundingSource() {
     
     if (fundingSource.status === 'verified') {
       console.log('\n✅ Funding source is already verified!');
-      await db.end();
       return;
     }
 
     if (fundingSource.status === 'unverified') {
       console.log('\n⚠️  Funding source needs verification via micro-deposits.');
+      
+      const proceed = await question('\nInitiate micro-deposits? (y/n): ');
+      if (proceed.toLowerCase() !== 'y') {
+        console.log('Cancelled.');
+        return;
+      }
+
       console.log('\n🔧 Initiating micro-deposits...');
       
       try {
@@ -123,14 +149,16 @@ async function verifyZachFundingSource() {
         console.log('   Amount 1: $0.03');
         console.log('   Amount 2: $0.07');
         console.log('\n   To verify, run:');
-        console.log(`   node verify-micro-deposits.js ${fundingSourceId} 0.03 0.07\n`);
+        console.log(`   node verify-micro-deposits.js`);
+        console.log(`   (Funding Source ID: ${fundingSourceId})\n`);
       } catch (error) {
         if (error.message.includes('already been initiated')) {
           console.log('✅ Micro-deposits already initiated!');
           console.log('\n📝 In SANDBOX, verify with:');
           console.log('   Amount 1: $0.03');
           console.log('   Amount 2: $0.07');
-          console.log(`\n   node verify-micro-deposits.js ${fundingSourceId} 0.03 0.07\n`);
+          console.log(`\n   node verify-micro-deposits.js`);
+          console.log(`   (Funding Source ID: ${fundingSourceId})\n`);
         } else {
           throw error;
         }
@@ -139,14 +167,14 @@ async function verifyZachFundingSource() {
       console.log(`\n⚠️  Unexpected status: ${fundingSource.status}`);
     }
 
-    await db.end();
   } catch (error) {
     console.error('❌ Error:', error.message);
     if (error.stack) console.error(error.stack);
-    await db.end();
     process.exit(1);
+  } finally {
+    rl.close();
+    await db.end();
   }
 }
 
-verifyZachFundingSource();
-
+verifyFundingSource();

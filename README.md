@@ -61,6 +61,11 @@ Server runs on [http://localhost:3000](http://localhost:3000)
 | Command | Description |
 |----------|-------------|
 | \`npm run dev\` | Run the server with **nodemon** (auto-reload on save) |
+| \`node setup-customer.js\` | Setup a new customer (interactive) |
+| \`node create-test-customer.js\` | Create a test Dwolla customer (interactive) |
+| \`node check-funding.js\` | Check a customer's funding source status (interactive) |
+| \`node check-and-verify-funding.js\` | Check and initiate micro-deposits for verification (interactive) |
+| \`node verify-micro-deposits.js\` | Verify micro-deposits (interactive) |
 | \`npm run migrate\` | Apply the SQL schema in \`sql/001_schema.sql\` |
 | \`npm run bill:week\` | Manually trigger the weekly Dwolla billing cron |
 | \`psql "$DATABASE_URL"\` | Open a Postgres shell to inspect tables |
@@ -86,7 +91,7 @@ Server runs on [http://localhost:3000](http://localhost:3000)
 curl -X POST http://localhost:3000/ghl/usage \
   -H "Authorization: Bearer <GHL_BEARER>" \
   -H "Content-Type: application/json" \
-  -d '{"crm_contact_id":"ZACH1","name":"Zach","email":"z@x.com","units":3,"occurred_at":"2025-11-07T20:30:00Z","idempotency_key":"ZACH1-1731011400"}'
+  -d '{"crm_contact_id":"CUSTOMER123","name":"John Doe","email":"john@example.com","units":3,"occurred_at":"2025-01-15T20:30:00Z","idempotency_key":"CUSTOMER123-1736974200"}'
 \`\`\`
 
 **Trigger billing manually:**
