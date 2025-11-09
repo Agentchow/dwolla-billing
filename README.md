@@ -56,6 +56,59 @@ Server runs on [http://localhost:3000](http://localhost:3000)
 
 ---
 
+## 🚀 Quick Start
+
+### Create a New Customer and Test
+
+**1. Create a test customer in Dwolla:**
+\`\`\`bash
+node create-test-customer.js
+\`\`\`
+- Enter CRM Contact ID (e.g., `CUSTOMER123`)
+- Enter First Name (e.g., `John`)
+- Enter Last Name (e.g., `Doe`)
+- Enter Email (e.g., `john@example.com`)
+- Choose `y` to update the database automatically
+
+**2. Check funding source status:**
+\`\`\`bash
+node check-funding.js
+\`\`\`
+- Enter the CRM Contact ID
+- This shows if the funding source is verified or unverified
+
+**3. Verify funding source (if unverified):**
+\`\`\`bash
+node check-and-verify-funding.js
+\`\`\`
+- Enter the CRM Contact ID
+- Choose `y` to initiate micro-deposits
+
+**4. Verify micro-deposits:**
+\`\`\`bash
+node verify-micro-deposits.js
+\`\`\`
+- Enter Funding Source ID (from the previous step)
+- Enter Amount 1: `0.03`
+- Enter Amount 2: `0.07`
+
+**5. Test the system:**
+\`\`\`bash
+# Start the server
+npm run dev
+
+# In another terminal, record usage
+curl -X POST http://localhost:3000/ghl/usage \
+  -H "Authorization: Bearer <YOUR_GHL_BEARER>" \
+  -H "Content-Type: application/json" \
+  -d '{"crm_contact_id":"CUSTOMER123","name":"John Doe","email":"john@example.com","units":3,"occurred_at":"2025-01-15T20:30:00Z","idempotency_key":"CUSTOMER123-test-1"}'
+
+# Run billing
+npm run bill:week
+\`\`\`
+
+---
+
 ## 🧠 Useful Commands
 
 | Command | Description |
