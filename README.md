@@ -96,13 +96,13 @@ node verify-micro-deposits.js
 \`\`\`bash
 # Start the server (in one terminal)
 npm run dev
+npm run bill:week
 
 # In another terminal, record usage
 curl -X POST http://localhost:3000/ghl/usage \
   -H "Authorization: Bearer <YOUR_GHL_BEARER>" \
   -H "Content-Type: application/json" \
   -d '{"crm_contact_id":"CUSTOMER123","name":"John Doe","email":"john@example.com","units":3,"occurred_at":"2025-01-15T20:30:00Z","idempotency_key":"CUSTOMER123-test-1"}'
-npm run bill:week
 
 # Run billing (in the same terminal as the curl command, or a third terminal)
 npm run bill:week
