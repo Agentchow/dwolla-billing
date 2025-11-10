@@ -93,10 +93,10 @@ node verify-micro-deposits.js
 - Enter Amount 2: `0.07`
 
 **5. Test the system:**
-\`\`\`bash
+\`\`\`bash 
 # Start the server (in one terminal)
-npm run dev
-npm run bill:week
+- npm run dev
+- npm run bill:week
 
 # In another terminal, record usage
 curl -X POST http://localhost:3000/ghl/usage \
