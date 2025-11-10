@@ -12,9 +12,12 @@ create table if not exists usage_ledger(
   idempotency_key text unique not null,
   crm_contact_id text not null,
   units numeric not null,
-  occurred_at timestamptz not null
+  occurred_at timestamptz not null,
+  invoice_id integer references invoices(id)
 );
 create index if not exists usage_idx on usage_ledger (crm_contact_id, occurred_at);
+create index if not exists usage_ledger_invoice_id_idx on usage_ledger(invoice_id);
+create index if not exists usage_ledger_unbilled_idx on usage_ledger(crm_contact_id, occurred_at) where invoice_id is null;
 
 create table if not exists invoices(
   id serial primary key,

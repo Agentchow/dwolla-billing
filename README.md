@@ -13,7 +13,8 @@ dwolla-billing/
 │   └── 001_schema.sql      # database schema
 ├── .env                    # environment variables (not committed)
 ├── package.json
-└── README.md
+├── README.md               # main documentation
+└── WEBHOOKS.md             # webhook configuration guide
 \`\`\`
 
 ---
@@ -89,13 +90,13 @@ node check-and-verify-funding.js
 \`\`\`bash
 node verify-micro-deposits.js
 \`\`\`
-- Enter Funding Source ID (from the previous step)
+- Enter Funding Source ID (from the previous step) (check on Dwolla website)
 - Enter Amount 1: `0.03`
 - Enter Amount 2: `0.07`
 
+
 **5. Test the system:**
 \`\`\`bash 
-- npm run dev
 - npm run bill:week
 
 # In another terminal, record usage
@@ -169,6 +170,9 @@ psql "$DATABASE_URL" -c "select * from invoices;"
   - \`/dwolla/webhook\` with signature verification  
 - Set up real cron job (or Render/host scheduler)  
 - Point DNS + SSL (optional)
+- Configure webhooks (see [WEBHOOKS.md](./WEBHOOKS.md))
+
+**📖 For detailed deployment instructions, see [RENDER_SETUP.md](./RENDER_SETUP.md)**
 
 ---
 

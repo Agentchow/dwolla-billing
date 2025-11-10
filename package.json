@@ -6,15 +6,16 @@
   "main": "src/server.js",
   "type": "commonjs",
   "scripts": {
+    "start": "node src/server.js",
     "dev": "nodemon src/server.js",
     "migrate": "node -e \"require('dotenv').config(); require('child_process').execSync('psql \\\"' + process.env.DATABASE_URL + '\\\" -f sql/001_schema.sql', {stdio: 'inherit'})\"",
-    "bill:week": "curl -s -X POST -H \"Authorization: Bearer admin\" http://localhost:3000/bill/week"
+    "migrate:002": "node -e \"require('dotenv').config(); require('child_process').execSync('psql \\\"' + process.env.DATABASE_URL + '\\\" -f sql/002_add_invoice_id_to_usage.sql', {stdio: 'inherit'})\"",
+    "bill:week": "curl -s -X POST -H \"Authorization: Bearer admin\" http://localhost:3001/bill/week"
   },
   "keywords": [],
   "author": "",
   "license": "ISC",
   "dependencies": {
-    "body-parser": "^2.2.0",
     "express": "^5.1.0",
     "luxon": "^3.7.2",
     "pg": "^8.16.3"
