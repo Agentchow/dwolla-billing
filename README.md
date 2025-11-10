@@ -94,7 +94,6 @@ node verify-micro-deposits.js
 
 **5. Test the system:**
 \`\`\`bash 
-# Start the server (in one terminal)
 - npm run dev
 - npm run bill:week
 
