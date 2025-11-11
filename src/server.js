@@ -112,7 +112,8 @@ app.post('/bill/week', async (req, res) => {
   const startTime = Date.now();
   
   try {
-    if (req.get('authorization') !== 'Bearer admin') {
+    const billingAuthToken = process.env.BILLING_AUTH_TOKEN || 'admin';
+    if (req.get('authorization') !== `Bearer ${billingAuthToken}`) {
       log.warn('Unauthorized billing job attempt', { ip: req.ip });
       return res.sendStatus(401);
     }
